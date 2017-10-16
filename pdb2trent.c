@@ -434,9 +434,9 @@ fprintf(fp_out_1,"Entropy in entropic units, reference state 1M, random orientat
 for(k = 0; k<flag_par.n ; k++)
 fprintf(fp_out_1,"ROT. TRANS. (E.U.): ent_k %i %e d_mean %e ld_mean %e\n", k+1, ent_k_tr[k] -2.0*log(2*M_PI) -7.414898, d_mean_tr[k+1],ld_mean_tr[k+1]);
 for(k = 0; k<flag_par.n ; k++)
-fprintf(fp_out_1,"TRANS. (E.U.): ent_k %i %e d_mean %e ld_mean %e\n", k+1, ent_k_t[k] -7.414898, d_mean_t[k+1],ld_mean_t[k+1]);
+fprintf(fp_out_1,"TRANS. (E.U.)     : ent_k %i %e d_mean %e ld_mean %e\n", k+1, ent_k_t[k] -7.414898, d_mean_t[k+1],ld_mean_t[k+1]);
 for(k = 0; k<flag_par.n ; k++)
-fprintf(fp_out_1,"ROT. (E.U.)      : ent_k %i %e d_mean %e ld_mean %e\n", k+1, ent_k_r[k] -2.0*log(2*M_PI), d_mean_r[k+1],ld_mean_r[k+1]);
+fprintf(fp_out_1,"ROT. (E.U.)       : ent_k %i %e d_mean %e ld_mean %e\n", k+1, ent_k_r[k] -2.0*log(2*M_PI), d_mean_r[k+1],ld_mean_r[k+1]);
 fclose(fp_out_1);
 }
 
