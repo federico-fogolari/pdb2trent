@@ -44,10 +44,12 @@ RUNNING TRENT
  - the name of the input pdb file 
  - the name of the torsion-adjacency definition file
  - a string for indication of atoms used for frame 
-The string takes the form of multiple ranges separated by spaces. 
-Each range is specified as "chain:residue numbers:atom", e.g.:
-"A:12-18,23-24:N,CA,C" for a single range and
-"A:12-18,23,24:N,CA,C A:104-111,115-123:N,CA,C" for two ranges
+ - a string for indication of atoms used to compute rotational-translational entropy 
+
+The string takes the form of multiple ranges separated by spaces. \\
+Each range is specified as "chain:residue numbers:atom", e.g.: \\
+"A:12-18,23-24:N,CA,C" for a single range and \\
+"A:12-18,23,24:N,CA,C A:104-111,115-123:N,CA,C" for two ranges \\
 residue numbers are ranges as 12-18 or single numbers separated by commas
 chains are a string of letters, e.g AB, and atom names are separated by commas,
 with no space. There is only minimal check on the string, so care must be taken 
