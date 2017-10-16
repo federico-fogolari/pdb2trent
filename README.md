@@ -46,11 +46,15 @@ RUNNING TRENT
  - a string for indication of atoms used for frame 
  - a string for indication of atoms used to compute rotational-translational entropy 
 
-The string takes the form of multiple ranges separated by spaces. \\
-Each range is specified as "chain:residue numbers:atom", e.g.: \\
-"A:12-18,23-24:N,CA,C" for a single range and \\
-"A:12-18,23,24:N,CA,C A:104-111,115-123:N,CA,C" for two ranges \\
-residue numbers are ranges as 12-18 or single numbers separated by commas
+The string takes the form of multiple ranges separated by spaces. 
+
+Each range is specified as "chain:residue numbers:atom", e.g.: 
+
+"A:12-18,23-24:N,CA,C" for a single range or 
+
+"A:12-18,23,24:N,CA,C A:104-111,115-123:N,CA,C" for two ranges 
+
+residue numbers are ranges as 12-18 or single numbers separated by commas,
 chains are a string of letters, e.g AB, and atom names are separated by commas,
 with no space. There is only minimal check on the string, so care must be taken 
 to follow strictly the expected format.
@@ -58,19 +62,28 @@ to follow strictly the expected format.
 Other options are listed hereafter
 
 Usage:
+
 ./pdb2trent pdb_infile def_infile outfile [Options]
+
 Options:
+
 -n (max k neighbours for listing entropies (20 default))
--nt X (number of threads to be used, if less than 1, e.g. with -nt 0, the program finds the number of threads available)
+
+-nt X (number of threads to be used, if less than 1, e.g. with -nt 0, the program finds the number of threads 
+available)
+
 -wp pdb_file (write superimposed structures in pdb_file)
+
 -v (verbose mode)
 
 USAGE EXAMPLES:
 
 --- compute rotational-translational entropy. For frame superposition use chain A, residues 
 12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C 
+
 To calculate rotation-translation distances use chain B, 
 residues 12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C
+
 Use 8 threads for parallel computation:
 
 ./pdb2trent sample.pdb sample.out "A:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" "B:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" -nt 8 
@@ -82,9 +95,10 @@ threads available for parallel computation and write superposed structures in fi
 
 OUTPUT
 
-1) The output lists the rotational-translational entropy in entropic units
-and then the translational and rotational entropies, computed isolatedly.
+1) The output lists the rotational-translational entropy in entropic units and then the translational and rotational entropies, computed isolatedly. 
+
 The reference state is: 1 M concentration, random orientation.
+
 The output lists:
 - the k^th nearest neighbour (k = 1..20 by default)
 - the entropy value (in R units)
