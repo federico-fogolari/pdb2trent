@@ -30,63 +30,63 @@ INSTALLATION:
 
 The program is compiled with: 
 
-- if OpenMP is installed: 
+- if OpenMP is installed:  
 cc pdb2trent.c -o pdb2trent -lm -fopenmp
 
-- otherwise:
+- otherwise:  
 cc pdb2trent.c -o pdb2trent -lm 
 
 RUNNING TRENT
 
 ./pdb2trent without arguments will print options available
 
-./pdb2trent expects at least the following arguments (in this order):
- - the name of the input pdb_file 
- - the name of the output file 
- - two strings for indication of atoms used for frame superposition 
-   and for entropy calculation. 
-The string takes the form of multiple ranges separated by spaces. 
-Each range is specified as "chain:residue_numbers:atom", e.g.:
+./pdb2trent expects at least the following arguments (in this order):  
+ - the name of the input pdb_file   
+ - the name of the output file  
+ - two strings for indication of atoms used for frame superposition  
+   and for entropy calculation.  
+The string takes the form of multiple ranges separated by spaces.   
+Each range is specified as "chain:residue_numbers:atom", e.g.:  
 "A:12-18,23-24:N,CA,C" for a single range and
 "A:12-18,23,24:N,CA,C A:104-111,115-123:N,CA,C" for two ranges
 
-Usage:
-./pdb2trent pdb_infile outfile "string1" "string2" [Options]
-string1 (atoms for superposition) format: "chains:r1,r2-r3,r4....:ATNAM1,ATNAM2... chains:r1,r2-r3,r4....:ATNAM1,ATNAM2..."
-string2 (atoms for rot-trans entropy calc.) format: "chain:r1:ATNAM1,ATNAM2,ATNAM3..."
+Usage:  
+./pdb2trent pdb_infile outfile "string1" "string2" [Options]  
+string1 (atoms for superposition) format: "chains:r1,r2-r3,r4....:ATNAM1,ATNAM2... chains:r1,r2-r3,r4....:ATNAM1,ATNAM2..."  
+string2 (atoms for rot-trans entropy calc.) format: "chain:r1:ATNAM1,ATNAM2,ATNAM3..."  
 
-Options:
--n (max k neighbours for listing entropies (20 default))
--b X (length to mix translational and rotational degrees of freedom)
--nt X (number of threads to be used, if less than 1 the program finds the number of threads available)
--wp pdb_file (write superimposed structures in pdb_file)
--v (verbose mode)
+Options:  
+-n (max k neighbours for listing entropies (20 default))  
+-b X (length to mix translational and rotational degrees of freedom)  
+-nt X (number of threads to be used, if less than 1 the program finds the number of threads available)  
+-wp pdb_file (write superimposed structures in pdb_file)  
+-v (verbose mode)  
 
-USAGE EXAMPLES:
+USAGE EXAMPLES:  
 
 --- compute rotational-translational entropy. For frame superposition use chain A, residues 
-12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C 
+12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C  
 To calculate rotation-translation distances use chain B, 
-residues 12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C
-Use 8 threads for parallel computation:
+residues 12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123 and atoms N,CA,C  
+Use 8 threads for parallel computation:  
 
 ./pdb2trent sample.pdb sample.out "A:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" "B:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" -nt 8 
 
 --- compute rotational-translational entropy using the same atoms as above. Use the maximum number of 
-threads available for parallel computation and write superposed structures in file sup.pdb:
+threads available for parallel computation and write superposed structures in file sup.pdb:  
 
 ./pdb2trent sample.pdb sample.out "A:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" "B:12-18,23-24,29-35,41-48,54-55,67-73,75-81,88-97,104-111,115-123:N,CA,C" -nt -1 -wp sup.pdb
 
-OUTPUT
+OUTPUT  
 
 1) The output lists the rotational-translational entropy in entropic units
 and then the translational and rotational entropies, computed isolatedly.
-The reference state is: 1 M concentration, random orientation.
+The reference state is: 1 M concentration, random orientation.  
 The output lists:
-- the k^th nearest neighbour (k = 1..20 by default)
-- the entropy value (in R units)
-- the average distance to the k^th nearest neighbour
-- the average log(distance to the k^th nearest neighbour)
+- the k^th nearest neighbour (k = 1..20 by default) 
+- the entropy value (in R units)  
+- the average distance to the k^th nearest neighbour  
+- the average log(distance to the k^th nearest neighbour)  
 
 sample.pdb is provided here only for demonstrative purposes, and to reduce the 
 computational time. Many more conformational samples (in the range of thousands) 
