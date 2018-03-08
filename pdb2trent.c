@@ -397,22 +397,22 @@ ent_k_t[k-1] = ent_k_t[k-1] + c - L;
 ent_k_r[k-1] = ent_k_r[k-1] + c - L;
 L = L + 1.0/(double) k;
 }
-fprintf(fp_out_1,"Entropy in entropic units, reference state 1M, random orientation\n");
+fprintf(fp_out_1,"Entropy in R units, reference state 1M, random orientation\n");
 for(k = 0; k<flag_par.n ; k++)
-fprintf(fp_out_1,"ROT. TRANS. (E.U.): ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_tr[k] -2.0*log(2*M_PI) -7.414898, d_mean_tr[k+1],ld_mean_tr[k+1]);
+fprintf(fp_out_1,"ROT. TRANS. (R units): ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_tr[k] -2.0*log(2*M_PI) -7.414898, d_mean_tr[k+1],ld_mean_tr[k+1]);
 for(k = 0; k<flag_par.n ; k++)
-fprintf(fp_out_1,"TRANS. (E.U.)     : ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_t[k] -7.414898, d_mean_t[k+1],ld_mean_t[k+1]);
+fprintf(fp_out_1,"TRANS. (R units)     : ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_t[k] -7.414898, d_mean_t[k+1],ld_mean_t[k+1]);
 for(k = 0; k<flag_par.n ; k++)
-fprintf(fp_out_1,"ROT. (E.U.)       : ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_r[k] -2.0*log(2*M_PI), d_mean_r[k+1],ld_mean_r[k+1]);
+fprintf(fp_out_1,"ROT. (R units)       : ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_r[k] -2.0*log(2*M_PI), d_mean_r[k+1],ld_mean_r[k+1]);
 
 if(system.n_models >= 11) k = 10;
 else
 k = system.n_models - 1;
 fprintf(fp_out_1,"\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n\n");
-fprintf(fp_out_1,"Total entropy estimate on %5i^th nearest neighbours:\n%10.2lf e.u.\n", k, ent_k_tr[k-1] -2.0*log(2*M_PI) -7.414898);
+fprintf(fp_out_1,"Total entropy estimate on %5i^th nearest neighbours:\n%10.2lf R units\n", k, ent_k_tr[k-1] -2.0*log(2*M_PI) -7.414898);
 fprintf(fp_out_1,"\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n\n");
-printf("Total entropy estimate on %5i^th nearest neighbours:\n%10.2lf e.u.\n", k, ent_k_tr[k-1] -2.0*log(2*M_PI) -7.414898);
+printf("Total entropy estimate on %5i^th nearest neighbours:\n%10.2lf R units\n", k, ent_k_tr[k-1] -2.0*log(2*M_PI) -7.414898);
 printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 
 
@@ -1541,9 +1541,14 @@ for(i = 0; i < ntok - 1;)
 l = -1;
 strcpy(c,tok[i++]);
 nc=strlen(c);
+if(nc==0)
+{
+strcpy(c," ");
+nc = 1;
+}
 if(punct[i-1] != ':') 
  {
- printf("ho letto le catene mi aspettavo i due punti...esco\n"); 
+ printf("I expected colon here... exiting...\n"); 
  exit(0);
  }
 do
