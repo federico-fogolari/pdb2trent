@@ -334,7 +334,7 @@ dtr = calloc(system.n_models,sizeof(double));
          for(l=0; l<3; l++)
          dr[j] = dr[j] + Ra[i][k][l] * Ra[j][k][l];
          }
-         if(fabs(dr[j] <= 3.0))
+         if(fabs(dr[j]) <= 3.0)
          dr[j] = acos(0.5 * (  dr[j] - 1));
          else if(dr[j] > 0) dr[j] = 0.0;
          else if(dr[j] < 0) dr[j] = M_PI;
