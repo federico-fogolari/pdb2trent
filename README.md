@@ -1,5 +1,5 @@
 # pdb2trent
-Translational Rotational entropy from pbd configurational ensembles 
+Translational Rotational entropy from pdb configurational ensembles 
 
 The program computes the rotational-translational entropy of one molecule
 with respect to the other. The input is a PDB with multiple models for the 
