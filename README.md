@@ -3,13 +3,15 @@ Translational Rotational entropy from pbd configurational ensembles
 
 The program computes the rotational-translational entropy of one molecule
 with respect to the other. The input is a PDB with multiple models for the 
-molecular complex.
-First a superposition is performed to put the complex in a common frame 
-where the first molecule is superposed on the first reference frame,
-using the atoms specified on the command-line. 
-Then rotation-translation distances based on the superposition of the atoms
-specified on the command-line, and finally the entropy is computed 
-using the nearest-neighbor method.
+molecular complex.  
+First a superposition is performed to put the complex in a common frame,
+in other words the global rotation and translation of the complex is removed.
+The first molecule (i.e. specific atoms of the first molecule) is superposed 
+on the first reference frame, using the atoms specified on the command-line. 
+Then rotation-translation distances based on the superposition of the second 
+molecule atoms specified on the command-line, and finally the entropy is 
+computed using the nearest-neighbor method.
+
 The theory and details of the method are reported in:
 
 F. Fogolari, C. J. Dongmo Foumthuim, S. Fortuna, M. A. Soler, A. Corazza, G. Esposito
@@ -58,6 +60,7 @@ string2 (atoms for rot-trans entropy calc.) format: "chain:r1:ATNAM1,ATNAM2,ATNA
 Options:  
 -n (max k neighbours for listing entropies (20 default))  
 -b X (length to mix translational and rotational degrees of freedom)  
+-s k (use only one snapshot every k snapshots)  
 -nt X (number of threads to be used, if less than 1 the program finds the number of threads available)  
 -wp pdb_file (write superimposed structures in pdb_file)  
 -v (verbose mode)  
@@ -91,3 +94,4 @@ The output lists:
 sample.pdb is provided here only for demonstrative purposes, and to reduce the 
 computational time. Many more conformational samples (in the range of thousands) 
 are needed for accurate estimations of entropy.
+More example files are available in the Download menu at biophysics.uniud.it

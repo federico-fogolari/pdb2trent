@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+/***** defines *********************/
 #define HUGE_INT -999999
 #define MAX_N_SUP_AT 5000
 #ifdef _OPENMP
@@ -12,8 +14,17 @@
 #endif
 
 
-/****** local structs ********/
+/****** structs ********/
 
+/* chain, residue, atom for superposition, i is the atom index */
+struct Cra {
+char c;
+int r;
+char a[5];
+int i;
+} Cra;
+
+/* structs for the molecular system */
 struct System { 
 int n_atoms;
 struct Atom *atoms;
@@ -26,13 +37,6 @@ struct Segment *segments;
 int n_models;
 struct Model *models;
 }  System;
-
-struct Cra {
-char c;
-int r;
-char a[5];
-int i;
-} Cra;
 
 
 struct Atom {
@@ -77,14 +81,7 @@ int model;
 struct Model { int model_n;
 int beg, end;
 }  Model;
-
-int omp_thread_count() {
-    int n = 0;
-    #pragma omp parallel reduction(+:n)
-    n += 1;
-    return n;
-}
-
+/* struct for program parameters and options */
 struct Flag_par {  
 	       char file_in_pdb[120];
                char file_out[120];
@@ -92,12 +89,15 @@ struct Flag_par {
                double bond;
                char s1[1024],s2[1024];
                int n, flag_n;
+               int skip;
                int nt;
                int wp;
                int verbose;
 	     } Flag_par;
 
-void read_PDB_atoms(FILE *fp1, int *n_atoms, struct Atom *atoms);
+/* function prototypes */
+int omp_thread_count();
+void read_PDB_atoms(FILE *fp1, int *n_atoms, struct Atom *atoms, int skip);
 void read_atom_pdb(char *buf, struct Atom *atom);
 double distv(double *r1, double *r2);
 void init_flag_par(struct Flag_par *flag_par);
@@ -108,6 +108,7 @@ void copy_atom(struct Atom *atom_to, struct Atom *atom_from);
 void make_system(struct System *system);
 void eliminate_alt_loc(struct System *system);
 double torsionv(double *x1, double *x2, double *x3, double *x4);
+void hpsort(struct Atom *ra, int n);
 void suppos(double **ref, double **mob, int len, double *t, double **R, double *rmsd, double **moball, int lenall);
 void quat_to_rot(double *q, double **R);
 void CalcQuarticCoeffs(double **coords1, double **coords2, int len, double *coeff);
@@ -121,6 +122,7 @@ void parse(struct Cra *cra, int *ncra, char *s);
 FILE *file_open(char *fname,char *acc);
 void diffv(double *v, double *r2, double *r1);
 double modv(double *x1);
+
 
 int main(int argc, char *argv[]) {
       FILE *fp_in_1, *fp_in_2, *fp_out_1;
@@ -137,8 +139,10 @@ int main(int argc, char *argv[]) {
       double *ent_k_r, *d_mean_r, *ld_mean_r;
       double *ent_k, *d, *d_mean, *ld_mean, *ent_k_tot, **h1, **h2,logdk;
       double **R, *t, **coords1,**coords2, rmsd, **coords, ***Ra, **ta, tt;
-      
+     
+/* Initialize options in struct flag_par */ 
         init_flag_par(&flag_par);      
+/* Check command line for options */
         check_cmd_line(argc, argv, &flag_par);      
         if(flag_par.nt < 1)
         num_threads = omp_thread_count();
@@ -146,6 +150,8 @@ int main(int argc, char *argv[]) {
         omp_set_num_threads(num_threads);
         print_info_flag_par(flag_par);      
         srand48(1);
+
+/* Count atoms in pdb file, allocate memory and read atoms */
 	fp_in_1 = file_open(flag_par.file_in_pdb,"r");
         system.n_atoms = 0;
         while(fgets(buf,120,fp_in_1) != NULL )
@@ -160,16 +166,17 @@ int main(int argc, char *argv[]) {
         fclose(fp_in_1); 
  
 	fp_in_1 = file_open(flag_par.file_in_pdb,"r");
-        read_PDB_atoms(fp_in_1, &(system.n_atoms), system.atoms);  
+        read_PDB_atoms(fp_in_1, &(system.n_atoms), system.atoms,flag_par.skip);  
         fclose(fp_in_1); 
         printf("atoms stored...\n");
+/* Create the structure of the system, by sorting atoms, residues, chains and segments */
         make_system(&system); 
 printf("atoms sorted ...\n");
 
-
-
+        /* allocate for strings to define atoms for superposition */
         cra = calloc(MAX_N_SUP_AT, sizeof(struct Cra));
 
+/* check that the number of residues and atoms modulo the number of models is zero and compute number of residues and atoms per model */
          if(system.n_residues % system.n_models == 0 && system.n_atoms % system.n_models == 0) 
                {
                n_res_per_model = system.n_residues / system.n_models;
@@ -179,12 +186,12 @@ printf("atoms sorted ...\n");
                }
           else {printf("n. atoms (%i) and residues (%i) modulo n_models (%i) != 0... exiting\n",system.n_atoms, system.n_residues,system.n_models); exit(0);}
 
+/* parse the string defining atoms for superposition */
 parse(cra,&ncra,flag_par.s1);
        for(k=0,l=0;k<ncra;k++)
        cra[k].i = -1;
 
-
-
+/* prepare for superposition */
     R = malloc(3 * sizeof(double *));
     for(i=0; i <3; i++)
         R[i] = malloc(3 * sizeof(double));
@@ -205,6 +212,7 @@ parse(cra,&ncra,flag_par.s1);
        coords1[l++] = system.atoms[cra[k].i].coor;
     nsupat = l;
 
+/* superimpose models to the first one using the first set of atoms to remove global motions */
     for(j=0; j<system.n_models; j++)
       { 
         l = 0;
@@ -215,6 +223,7 @@ parse(cra,&ncra,flag_par.s1);
       coords[i-system.models[j].beg] = system.atoms[i].coor;
       suppos(coords1, coords2, nsupat, t, R, &rmsd, coords, n_atoms_per_model);
       }
+/* if wanted write out superimposed models */
      if(flag_par.wp)
      {
      fp_out_1=fopen(flag_par.pdb_outfile,"w");
@@ -246,6 +255,8 @@ parse(cra,&ncra,flag_par.s1);
       }
      fclose(fp_out_1);
      }
+
+/* prepare for finding relative rotations and translations of the second set of atoms */
 Ra = calloc(system.n_models, sizeof(double **));
 ta = calloc(system.n_models, sizeof(double *));
 for(i=0; i< system.n_models; i++)
@@ -261,9 +272,10 @@ Ra[i][j] = calloc(3, sizeof(double));
     free(R);
     free(t);
 ncra = 0;
+/* parse second set of atoms */
 parse(cra,&ncra,flag_par.s2);
 
-
+/* find atoms */
        for(k=0;k<ncra;k++)
        cra[k].i = -1;
     for(i=system.models[0].beg, l=0; i<= system.models[0].end; i++)
@@ -281,7 +293,7 @@ parse(cra,&ncra,flag_par.s2);
        nsupat = l;
     for(i=0; i< n_atoms_per_model; i++)
         coords[i] = calloc(3, sizeof(double));
-
+/* find rotation and translation to superimpose atoms on the first model */
     for(j=0; j < system.n_models; j++)
       { 
         l = 0;
@@ -294,7 +306,8 @@ parse(cra,&ncra,flag_par.s2);
         nsupat = l;
        suppos(coords1, coords2, nsupat, t, R, &rmsd, coords, n_atoms_per_model);       
       }
-
+/*... calculate the distance between rotation-translations 
+and calculate entropy based on the nearest neighbor method */
 t = NULL;
 R = NULL;
 t = calloc(3, sizeof(double));
@@ -346,6 +359,7 @@ dtr = calloc(system.n_models,sizeof(double));
 
 for(k = 1; k<=flag_par.n; k++)
 {
+/* apply the approximation to the volume of a ball in the rotation-translation space */
 V = M_PI * M_PI * M_PI * pow(dtr[k],3.0) * 
    (  pow(dtr[k]/flag_par.bond,3.0) / 12.0  
     - pow(dtr[k]/flag_par.bond,5.0) / 384.0 
@@ -397,6 +411,7 @@ ent_k_t[k-1] = ent_k_t[k-1] + c - L;
 ent_k_r[k-1] = ent_k_r[k-1] + c - L;
 L = L + 1.0/(double) k;
 }
+/* output rotation-translation and rotation-only and translation only entropy */
 fprintf(fp_out_1,"Entropy in R units, reference state 1M, random orientation\n");
 for(k = 0; k<flag_par.n ; k++)
 fprintf(fp_out_1,"ROT. TRANS. (R units): ent_k %3i %e d_mean %e ld_mean %e\n", k+1, ent_k_tr[k] -2.0*log(2*M_PI) -7.414898, d_mean_tr[k+1],ld_mean_tr[k+1]);
@@ -419,6 +434,7 @@ printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 fclose(fp_out_1);
 }
 
+/* read the command line */
 void check_cmd_line(int argc, char *argv[], struct Flag_par *flag_par)
 {
 	int i;
@@ -435,6 +451,7 @@ void check_cmd_line(int argc, char *argv[], struct Flag_par *flag_par)
 	printf("Options:\n"); 
 	printf("-n (max k neighbours for listing entropies (20 default))\n"); 
 	printf("-b X (length of bond to mix translational and rotational degrees of freedom)\n"); 
+        printf("-s k (keep only one sample every k samples)\n");
 	printf("-nt X (number of threads to be used, if less than 1 the program finds the number of threads available)\n"); 
 	printf("-wp pdb_file (write superimposed structures in pdb_file)\n"); 
 	printf("-v (verbose mode)\n"); 
@@ -452,7 +469,8 @@ void check_cmd_line(int argc, char *argv[], struct Flag_par *flag_par)
 		if (!strncmp(argv[i],"-v",3)) (*flag_par).verbose = 1;
 		else if (!strncmp(argv[i],"-b",3)) (*flag_par).bond = atoi(argv[++i]);
 		else if (!strncmp(argv[i],"-nt",4)) (*flag_par).nt = atoi(argv[++i]);
-		else if (!strncmp(argv[i],"-wp",4)) 
+   	        else if (!strncmp(argv[i],"-s",3)) (*flag_par).skip = atoi(argv[++i]);
+else if (!strncmp(argv[i],"-wp",4)) 
                  {
                  flag_par->wp = 1;
                  strcpy(flag_par->pdb_outfile,argv[++i]);
@@ -472,16 +490,19 @@ printf("\n########################################################\n\n");
 
 }
 
+/* initialize options */
 void init_flag_par(struct Flag_par *flag_par)
 {
 (*flag_par).flag_n=1;
 (*flag_par).nt=1;
+(*flag_par).skip=1;
 (*flag_par).wp=0;
 (*flag_par).bond=1.0;
 (*flag_par).n=20;
 (*flag_par).verbose=0;
 }
 
+/* print options */
 void print_info_flag_par(struct Flag_par flag_par)
 {
 	printf("########################################################\n"); 
@@ -494,6 +515,7 @@ void print_info_flag_par(struct Flag_par flag_par)
         printf("I will use %i threads\n", flag_par.nt);
         else
         printf("I will use all threads available\n");
+        printf("I will use 1 snapshot every %i snapshots\n", flag_par.skip);
         printf("I will print entropy only for the first %i neighbours\n", flag_par.n);
         printf("I will superimpose all structures on the first one\n");
         if(flag_par.wp)
@@ -505,6 +527,7 @@ void print_info_flag_par(struct Flag_par flag_par)
 	printf("########################################################\n\n"); 
 }
 
+/* implicit compare function */
 int comp (const void * elem1, const void * elem2) {
     double f1 = *((double *)elem1);
     double f2 = *((double *)elem2);
@@ -513,6 +536,7 @@ int comp (const void * elem1, const void * elem2) {
     return 0;
 }
 
+/* wrap of fopen() */
 FILE *file_open(char *fname,char *acc) {
     FILE *fp;
     fp =fopen(fname,acc);
@@ -524,26 +548,34 @@ FILE *file_open(char *fname,char *acc) {
     return(fp);
 }
 
-void read_PDB_atoms(FILE *fp1, int *n_atoms, struct Atom *atoms)
+/* read coordinates in PDB file */ 
+void read_PDB_atoms(FILE *fp1, int *n_atoms, struct Atom *atoms, int skip)
 {
 	char buf[120];
 	int i=0;
         int mod_id=1;
+        int j=1;
 
 	while(fgets(buf,120,fp1) != NULL )
     	if(!strncmp("ATOM",buf,4)) 
             {
-	    	atoms[i].model=mod_id; 
-			read_atom_pdb(buf, &atoms[i]);
+	    atoms[i].model=j; 
+	    read_atom_pdb(buf, &atoms[i]);
+            if((mod_id % skip) == 0)
             i++;
             if(i%100000 == 0) printf("%i atoms read...\n",i); 
 	    }
 	    else
 	      if(!strncmp("ENDMDL",buf,6)) 
+              {
               mod_id++; 
+              if((mod_id % skip) == 0)
+              j++;
+              }
 	*n_atoms = i;
 }
 
+/* read atom line in PDB file */
 void read_atom_pdb(char *buf, struct Atom *atom)
 {
 
@@ -634,7 +666,7 @@ void read_atom_pdb(char *buf, struct Atom *atom)
 
 }
 
-
+/* implicit compare function for sorting atoms */
 int cmp_atoms(const void *p1, const void *p2)
 {
 	struct Atom A_atom, B_atom;
@@ -688,8 +720,7 @@ int cmp_atoms(const void *p1, const void *p2)
 
 }
 
-void hpsort(struct Atom *ra, int n);
-
+/* Create the structure of the system, by sorting atoms, residues, chains and segments */
 void make_system(struct System *system)
 {
 	int n_atoms = system->n_atoms;
@@ -902,6 +933,7 @@ if(n_atoms != 0)
 	printf("########################################################\n\n"); 
 }
 
+/* heapsort */
 void hpsort(struct Atom *ra, int n)
 {  
     int N, i, parent, child;  
@@ -938,7 +970,7 @@ void hpsort(struct Atom *ra, int n)
     }  
 }
 
-
+/* copy struct Atom */
 void copy_atom(struct Atom *atom_to, struct Atom *atom_from)
 {
 int i;
@@ -958,6 +990,7 @@ strcpy((*atom_to).segid,(*atom_from).segid);
 strcpy((*atom_to).pdb_chrg,(*atom_from).pdb_chrg);
 }
 
+/* if two sorted atoms are the same, e.g. with different occupancies keep the first one */
 void eliminate_alt_loc(struct System *system)
 {
 int i,j;
@@ -989,6 +1022,7 @@ exit(0);
 }
 }
 
+/* vector math utilities */
 void scale(double *v, double a)
 {
 	v[0] = v[0] * a;
@@ -1040,7 +1074,7 @@ double distv(double *r1, double *r2)
 	return d;
 }
 
-
+/* superpose two sets of coordinates using and adapting the routines of Theobald */ 
 void suppos(double **ref, double **mob, int len, double *t, double **R, double *rmsd, double **moball, int lenall)
 {
     double          innerprod;
@@ -1499,6 +1533,7 @@ double eval_horn_quart_deriv(double *c, double x)
     return(2.0*(2.0*x*x + c[2])*x + c[1]);
 }
 
+/* parse a string with chain, residue number and atom names */
 void parse(struct Cra *cra, int *ncra, char *s)
 {
 int i,j,k,l,kk,in;
@@ -1584,4 +1619,13 @@ kk++;
 }
 *ncra = kk;
 } 
+
+/* count how many threads are available for openMP */
+int omp_thread_count() {
+    int n = 0;
+    #pragma omp parallel reduction(+:n)
+    n += 1;
+    return n;
+}
+
 
