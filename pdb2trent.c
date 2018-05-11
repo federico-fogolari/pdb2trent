@@ -563,7 +563,6 @@ void read_PDB_atoms(FILE *fp1, int *n_atoms, struct Atom *atoms, int skip)
 	    read_atom_pdb(buf, &atoms[i]);
             if((mod_id % skip) == 0)
             i++;
-            if(i%100000 == 0) printf("%i atoms read...\n",i); 
 	    }
 	    else
 	      if(!strncmp("ENDMDL",buf,6)) 
