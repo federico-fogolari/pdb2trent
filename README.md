@@ -13,17 +13,17 @@ the superposition of the second molecule atoms specified on the command-line,
 and finally the translational-rotational entropy is 
 computed using the nearest-neighbor method.
 
-CONTACT:
+CONTACT:  
 
-Federico Fogolari
-Dipartimento di Scienze Matematiche, Informatiche e Fisiche
-Universita' di Udine
-Via delle Scienze 206
-33100 Udine - Italy
-Tel ++39 0432 494320
-E-mail federico.fogolari@uniud.it
+Federico Fogolari  
+Dipartimento di Scienze Matematiche, Informatiche e Fisiche  
+Universita' di Udine  
+Via delle Scienze 206  
+33100 Udine - Italy  
+Tel ++39 0432 494320  
+E-mail federico.fogolari@uniud.it  
 
-REFERENCE:
+REFERENCE:  
 
 Please cite:  
 F. Fogolari, O. Maloku, C.J. Dongmo Foumthuim, A. Corazza, G. Esposito
