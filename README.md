@@ -40,8 +40,9 @@ J. Chem. Theory. Comput., 12, 1-8, 2016.    
 In the built-in superposition tool, routines are suitable modifications of
 those written by D.L. Theobald, therefore, if you use these routines, please 
 cite:  
-Theobald, D. L. (2005). Rapid calculation of rmsds using a quaternion-based
-characteristic polynomial. Acta. Crystallogr. A, 61, 478–480.
+Theobald, D. L.   
+Rapid calculation of rmsds using a quaternion-based characteristic polynomial.  
+Acta. Crystallogr. A, 61, 478–480, 2005.  
 
 ============================================================================
 
