@@ -26,13 +26,13 @@ E-mail federico.fogolari@uniud.it
 REFERENCE:  
 
 Please cite:  
-F. Fogolari, O. Maloku, C.J. Dongmo Foumthuim, A. Corazza, G. Esposito
-PDB2ENTROPY and PDB2TRENT: entropy from conformational ensembles
-J. Chem. Inf. Model. (submitted)
+F. Fogolari, O. Maloku, C.J. Dongmo Foumthuim, A. Corazza, G. Esposito  
+PDB2ENTROPY and PDB2TRENT: conformational and translational-rotational entropy from molecular ensembles  
+J. Chem. Inf. Model. (submitted)  
 
 The theory and details of the method are reported in:  
-F. Fogolari, C. J. Dongmo Foumthuim, S. Fortuna, M. A. Soler, A. Corazza, G. Esposito
-Accurate estimation of the entropy of rotation-translation probability distributions
+F. Fogolari, C. J. Dongmo Foumthuim, S. Fortuna, M. A. Soler, A. Corazza, G. Esposito  
+Accurate estimation of the entropy of rotation-translation probability distributions  
 J. Chem. Theory. Comput., 12, 1-8, 2016.    
 
 ============================================================================
