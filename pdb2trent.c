@@ -357,9 +357,9 @@ dtr = calloc(system.n_models,sizeof(double));
         if(i != j)
          {
          dt[j] = distv(ta[i],ta[j]); 
-		if(dt[j] <= 0.0) 
+		if(dt[j] < flag_par.minres) 
 		{
-			dt[j] = 1e-10;
+			dt[j] = flag_par.min_res;
 		}
          for(k=0, dr[j] = 0.0; k<3; k++)
          {
