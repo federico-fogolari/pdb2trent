@@ -87,6 +87,7 @@ struct Flag_par {
                char file_out[120];
                char pdb_outfile[120];
                double bond;
+               double minres;
                char s1[1024],s2[1024];
                int n, flag_n;
                int skip;
@@ -486,6 +487,7 @@ void check_cmd_line(int argc, char *argv[], struct Flag_par *flag_par)
 	for (i = 5; i < argc; i++) {
 		if (!strncmp(argv[i],"-v",3)) (*flag_par).verbose = 1;
 		else if (!strncmp(argv[i],"-b",3)) (*flag_par).bond = atoi(argv[++i]);
+		else if (!strncmp(argv[i],"-mr",4)) (*flag_par).minres = atoi(argv[++i]);
 		else if (!strncmp(argv[i],"-nt",4)) (*flag_par).nt = atoi(argv[++i]);
    	        else if (!strncmp(argv[i],"-s",3)) (*flag_par).skip = atoi(argv[++i]);
 else if (!strncmp(argv[i],"-wp",4)) 
@@ -516,6 +518,7 @@ void init_flag_par(struct Flag_par *flag_par)
 (*flag_par).skip=1;
 (*flag_par).wp=0;
 (*flag_par).bond=1.0;
+(*flag_par).minres=1.0e-10;
 (*flag_par).n=20;
 (*flag_par).verbose=0;
 }
@@ -533,7 +536,9 @@ void print_info_flag_par(struct Flag_par flag_par)
         printf("I will use %i threads\n", flag_par.nt);
         else
         printf("I will use all threads available\n");
-        printf("I will use 1 snapshot every %i snapshots\n", flag_par.skip);
+	printf("To avoid zeros in the distances I assume %e radian minimum distance\n", flag_par.minres);
+	printf("I will use length %8.5lf to mix translation and rotation distances\n", flag_par.bond);
+	printf("I will use 1 snapshot every %i snapshots\n", flag_par.skip);
         printf("I will print entropy only for the first %i neighbours\n", flag_par.n);
         printf("I will superimpose all structures on the first one\n");
         if(flag_par.wp)
