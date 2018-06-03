@@ -536,7 +536,7 @@ void print_info_flag_par(struct Flag_par flag_par)
         printf("I will use %i threads\n", flag_par.nt);
         else
         printf("I will use all threads available\n");
-	printf("To avoid zeros in the distances I assume %e radian minimum distance\n", flag_par.minres);
+	printf("To avoid zeros in the distances I assume %e Angstrom minimum distance\n", flag_par.minres);
 	printf("I will use length %8.5lf to mix translation and rotation distances\n", flag_par.bond);
 	printf("I will use 1 snapshot every %i snapshots\n", flag_par.skip);
         printf("I will print entropy only for the first %i neighbours\n", flag_par.n);
