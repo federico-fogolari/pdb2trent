@@ -350,7 +350,10 @@ dtr = calloc(system.n_models,sizeof(double));
         if(i != j)
          {
          dt[j] = distv(ta[i],ta[j]); 
-            
+		if(dt[j] <= 0.0) 
+		{
+			dt[j] = 0.0008660254;
+		}
          for(k=0, dr[j] = 0.0; k<3; k++)
          {
          for(l=0; l<3; l++)
