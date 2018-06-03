@@ -178,7 +178,13 @@ int main(int argc, char *argv[]) {
         read_PDB_atoms(fp_in_1, &(system.n_atoms), system.atoms,flag_par.skip);  
         fclose(fp_in_1); 
         printf("atoms stored...\n");
-/* Create the structure of the system, by sorting atoms, residues, chains and segments */
+	
+	/* add random number in range -0.0005 to 0.0005 to each coordinate */
+        for(i = 0; i< system.n_atoms; i++)
+        for(k = 0; k< 3; k++)
+        system.atoms[i].coor[k] += (drand48() - 0.5) * 0.001;
+
+	/* Create the structure of the system, by sorting atoms, residues, chains and segments */
         make_system(&system); 
 printf("atoms sorted ...\n");
 
@@ -352,7 +358,7 @@ dtr = calloc(system.n_models,sizeof(double));
          dt[j] = distv(ta[i],ta[j]); 
 		if(dt[j] <= 0.0) 
 		{
-			dt[j] = 0.0008660254;
+			dt[j] = 1e-10;
 		}
          for(k=0, dr[j] = 0.0; k<3; k++)
          {
