@@ -486,8 +486,8 @@ void check_cmd_line(int argc, char *argv[], struct Flag_par *flag_par)
 
 	for (i = 5; i < argc; i++) {
 		if (!strncmp(argv[i],"-v",3)) (*flag_par).verbose = 1;
-		else if (!strncmp(argv[i],"-b",3)) (*flag_par).bond = atoi(argv[++i]);
-		else if (!strncmp(argv[i],"-mr",4)) (*flag_par).minres = atoi(argv[++i]);
+		else if (!strncmp(argv[i],"-b",3)) (*flag_par).bond = atof(argv[++i]);
+		else if (!strncmp(argv[i],"-mr",4)) (*flag_par).minres = atof(argv[++i]);
 		else if (!strncmp(argv[i],"-nt",4)) (*flag_par).nt = atoi(argv[++i]);
    	        else if (!strncmp(argv[i],"-s",3)) (*flag_par).skip = atoi(argv[++i]);
 else if (!strncmp(argv[i],"-wp",4)) 
