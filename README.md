@@ -28,7 +28,7 @@ REFERENCE:
 Please cite:  
 F. Fogolari, O. Maloku, C.J. Dongmo Foumthuim, A. Corazza, G. Esposito  
 PDB2ENTROPY and PDB2TRENT: conformational and translational-rotational entropy from molecular ensembles  
-J. Chem. Inf. Model. (submitted)  
+J. Chem. Inf. Model. 2018, 58, 1319-1324  
 
 The theory and details of the method are reported in:  
 F. Fogolari, C. J. Dongmo Foumthuim, S. Fortuna, M. A. Soler, A. Corazza, G. Esposito  
